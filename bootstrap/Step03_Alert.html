@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step03_Alert.html</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+</head>
+<body>
+    <div class="container">
+        <h1>알림 메세지</h1>
+        <p class="alert alert-success">
+            성공적으로 작업이 끝났습니다.
+        </p>
+        <p class="alert alert-info">
+            삭제 했습니다. 
+            <a class="alert-link" href="#">확인</a>
+        </p>
+        <p class="alert alert-warning alert-dismissible" id="myAlert">
+            <strong>Oops!</strong>
+            작업이 실패 했습니다
+            <button id="closeBtn" class="btn-close"></button>
+        </p>
+        <p>
+            bootstrap javascript 를 로딩하고 
+            data-bs-xxx 속성을 적절히 추가하면 자동으로 동작하는 UI 가 있다.
+        </p>
+        <p class="alert alert-danger alert-dismissible">
+            <strong>Oops!</strong>
+            작업이 실패 했습니다
+            <button class="btn-close" data-bs-dismiss="alert"></button>
+        </p>
+        <p data-msg="hello">어쩌구.. 저쩌구..</p>
+        <button id="testBtn">테스트</button>
+        <button id="testBtn2" data-num="10">테스트</button>
+        <button id="testBtn3" data-num="20">테스트</button>
+    </div>
+    <!-- bootstrap javascript 로딩 -->
+    <script src="js/bootstrap.bundle.js"></script>
+    <script>
+        document.querySelector("#closeBtn").addEventListener("click", ()=>{
+            document.querySelector("#myAlert").style.display="none";
+        });
+
+        document.querySelector("#testBtn").addEventListener("click", ()=>{
+            const str=document.querySelector("[data-msg=hello]").innerText;
+            alert(str);
+        });
+
+        document.querySelector("#testBtn2").addEventListener("click", (e)=>{
+            const num=e.target.getAttribute("data-num");
+            alert(num);
+        });
+
+        document.querySelector("#testBtn3").addEventListener("click", (e)=>{
+            const num=e.target.getAttribute("data-num");
+            alert(num);
+        });
+    </script>
+</body>
+</html>

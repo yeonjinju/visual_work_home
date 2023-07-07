@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step09_example5.html</title>
+    <style>
+        canvas{
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+    <h1>canvas 요소 활용해 보기</h1>
+    <p> 잡은 토끼의 갯수 : <strong id="point">0</strong></p>
+    <!-- canvas 요소는 width 와 height 를 속성으로 직접 지정할수 있다. -->
+    <canvas id="myCanvas" width="800" height="500"></canvas>
+    <script> 
+        //잡은 토끼의 갯수를 저장할 변수 선언하고 초기값 0  대입
+        let point=0;
+
+        //canvas 요소의 참조값 
+        const canvas=document.querySelector("#myCanvas");
+        //canvas 에 그림을 그릴 도구(context) 객체 얻어내기
+        const context=canvas.getContext("2d");
+
+        //canvas 에 그릴 이미지 로딩하기
+        const snipeImg=new Image();
+        snipeImg.src="images/snipe.png";
+        
+        const holeImg=new Image();
+        holeImg.src="images/hole.png";
+
+        const backImg=new Image();
+        backImg.src="images/background.jpg";
+
+        //토끼 이미지 로딩
+        const rabbitImg1=new Image();
+        rabbitImg1.src="images/rabbit_1.png";
+        const rabbitImg2=new Image();
+        rabbitImg2.src="images/rabbit2.png";
+        //로딩된 이미지를 배열에 담아 놓는다 (나중에 애니매이션 효과를 주기 위해)
+        const rabbitImgs=[rabbitImg1, rabbitImg2];
+
+        //snipe 의 좌표
+        let snipeX=0, snipeY=0;
+        //총알 구멍 객체(object) 를 저장할 배열
+        const holes=[];
+        //토끼의 좌표
+        let rabbitX=400, rabbitY=250;
+        //토끼 이미지 인덱스
+        let rabbitIndex=0;
+        //카운트를 셀 변수
+        let count=0;
+        //효과음 로딩하기
+        const fireSound=new Audio("sounds/fire.wav");
+        const dieSound=new Audio("sounds/birddie.mp3");
+
+        //풍선 이미지를 저장할 배열
+        const bubbleImgs=[];
+        //반복문 돌면서 
+        for(let i=0; i<6; i++){
+            //풍선 이미지를 로딩해서 
+            let tmp=new Image();
+            tmp.src="images/b"+i+".png";
+            //배열에 누적 시키기
+            bubbleImgs.push(tmp);
+        }
+
+        //풍선의 정보를 저장할 배열
+        const bubbles=[];
+
+        //글자의 크기, 글꼴
+        context.font="20px consolas";
+        //글자의 색상
+        context.fillStyle="yellow";
+
+        //시계 다이얼 이미지
+        const dialImg=new Image();
+        dialImg.src="images/dial.png";
+        //초침 이미지
+        const secImg=new Image();
+        secImg.src="images/clock_sec.png";
+
+        //분침 이미지
+        const minImg=new Image();
+        minImg.src="images/clock_min.png";
+        //시침 이미지
+        const hourImg=new Image();
+        hourImg.src="images/clock_hour.png";
+        //캡 이미지
+        const capImg=new Image();
+        capImg.src="images/clock_point.png";
+
+        //시계를 그릴 좌표
+        const clockX=700;
+        const clockY=100;
+        
+        setInterval(()=>{
+            //함수가 호출될때 마다 count 를 1 씩 증가 시킨다 
+            count++;
+            //여기 함수 내부는 1/100 초 마다 한번씩 실행된다.
+            //context.clearRect(0, 0, 800, 500);
+            //배경이미지를 canvas 의 크기에 맞게 그린다.
+            context.drawImage(backImg, 0, 0, 800, 500);
+
+            //현재 context 의 정상 상태(변화를 가하지 않은 상태)를 저장한다.
+            context.save();
+            //시계를 그릴 좌표로 평행 이동한다.
+            context.translate(clockX, clockY);
+            //시계를 원점에 그리기
+            context.drawImage(dialImg, 0-100, 0-100, 200, 200);
+        
+            //현재 시간
+            const d=new Date();
+            const hour=d.getHours();
+            const min=d.getMinutes();
+            const sec=d.getSeconds();
+
+            //초침의 회전각 계산
+            const rSec=6*sec*(Math.PI/180); // rad
+
+            //초침의 회전각 만큼 좌표계를 회전시켜서 
+            context.rotate(rSec);
+            //초침 그리기(시계 중심 좌표를 기준으로 그려본다)
+            context.drawImage(secImg, 0-4, 0-90, 8, 90);
+            //분침의 회전각 계산
+            const rMin = (6*min + 6*sec/60 )*(Math.PI/180)
+            //분침의 회전각 만큼 좌표계를 회전 시켜서 
+            context.rotate(rMin-rSec);
+            //분침 그리기
+            context.drawImage(minImg, 0-4, 0-90, 8, 90);
+            
+            //시침의 회전각 계산
+            const rHour = (30*hour + 30*min/60)*(Math.PI/180);
+            context.rotate(rHour-rMin);
+            //시침
+            context.drawImage(hourImg, 0-4, 0-90, 8, 90);
+            //캡 그리기
+            context.drawImage(capImg, -7, -7, 14, 14);
+            //다른 그림에 영향이 가지 않도록 저장했던 정상상태로 context 를 되돌린다.
+            context.restore();
+
+            //총알 구멍 이미지를 반복문 돌면서 모두 그린다.
+            for(let i=0; i<holes.length; i++){
+                //i번째 총알 구멍 이미지 정보를 담고 있는 객체를 불러와서 
+                let tmp=holes[i];
+                //거기에 담긴 x, y 좌표를 이용해서 총알 구멍을 그린다.
+                context.drawImage(holeImg, tmp.x-10, tmp.y-10, 20, 20);
+            }
+            //토끼 그리기
+            context.drawImage(rabbitImgs[rabbitIndex], rabbitX-50, rabbitY-50, 100, 100);
+            //풍선 그리기
+            for(let i=0; i<bubbles.length; i++){
+                //i번째 풍선 정보를 가지고 있는 object 를 참조해서
+                let tmp=bubbles[i];
+                //object 안에 있는 정보를 바탕으로 풍선을 그린다.
+                context.drawImage(bubbleImgs[tmp.index], tmp.x-25, tmp.y-25, 50, 50);
+            }
+            //풍선 움직이기
+            for(let i=0; i<bubbles.length; i++){
+                let tmp=bubbles[i];
+                //각각의 풍선이 가지고 있는 speedX, speedY 값 만큼 x,y 좌표를 변화 시킨다.
+                tmp.x += tmp.speedX;
+                tmp.y += tmp.speedY;
+                //위에서 움직인 직후 풍선이 화면을 벗어 났는지 판별해서
+                let isOut = tmp.x<-25 || tmp.x>825 || tmp.y<-25 || tmp.y>525;
+                //만일 벗어 났다면
+                if(isOut){
+                    tmp.isOut=true;
+                }
+            }
+            //풍선 체크하기 (화면을 벗어난 풍선은 제거하기)
+            for(let i=0; i<bubbles.length; i++){
+                let tmp=bubbles[i];
+                //만일 i 번째 풍선이 화면을 벗어 났다면 
+                if(tmp.isOut){
+                    //bubbles 배열에서 i 번째 방에서 부터 1개 잘라내기(삭제하기)
+                    bubbles.splice(i, 1);
+                }
+            }
+
+            //스나이프 그리기
+            context.drawImage(snipeImg, snipeX-50, snipeY-50, 100, 100);
+            //글짜 출력하기 .fillText(글내용, 좌하단의 x, 좌하단의 y)
+            context.fillText("Point : "+point, 10, 30);
+
+            if(count%20 == 0){
+                //토끼 이미지 인덱스 1 증가 시키기
+                rabbitIndex++;
+                //만일 존재하지 않는 인덱스라면 0 으로 초기화 하기 
+                if(rabbitIndex==2){
+                    rabbitIndex=0;
+                }
+            }
+            // 0~ 99 사이의 랜덤한 정수를 얻어내서 
+            let ranNum=parseInt(Math.random()*100);
+            // 우연히 10이 나올때만 (확률상 1초에 대략 1번꼴)
+            if(ranNum == 10){
+                //토끼를 랜덤한 위치로 움직이게 하기
+                rabbitX = Math.random()*700 + 50;
+                rabbitY = Math.random()*400 + 50;
+            }
+        }, 10);
+
+        //canvas 요소의 mousemove 이벤트 처리
+        canvas.addEventListener("mousemove", (e)=>{
+            //이벤트가 발생한곳의 canvas 내에서의 좌표를 snipeX, snipeY 에 반영
+            snipeX=e.offsetX;
+            snipeY=e.offsetY;
+        });
+
+        canvas.addEventListener("mousedown", (e)=>{
+            //mousedown 이벤트가 발생한 곳의 좌표를 변수에 담아놓고 아래에서 2번 활용하기 
+            let x=e.offsetX;
+            let y=e.offsetY;
+            //이벤트가 발생한 곳의 좌표를 object 에 담는다.
+            //const hole={x:x, y:y};
+            const hole={x, y}; // 위의 표현식을 줄여서 이렇게 쓸수 있다.
+            //holes 배열에 저장(누적) 시킨다.
+            holes.push(hole);
+            //재생 위치를 처음으로 리셋후
+            fireSound.currentTime=0;
+            //총소리 재생하면 빠르게 마우스를 눌러도 연송 재생이 된다.
+            fireSound.play();
+            //토끼가 총에 맞았는지 판별해서 맞았으면 효과음 재생
+
+            //토끼가 총에 맞았는지 여부 
+            let isRabbitDie = x > rabbitX-50 &&
+                              x < rabbitX+50 &&
+                              y > rabbitY-50 &&
+                              y < rabbitY+50; 
+
+            if(isRabbitDie){
+                dieSound.currentTime=0;
+                dieSound.play();
+                //여기서 풍선 6개 만들기 
+                for(let i=0; i<6; i++){
+                    //새로운 object를 하나 만들어서 
+                    let tmp={};
+                    //풍선하나의 정보를 담고 
+                    tmp.x=rabbitX;
+                    tmp.y=rabbitY;
+                    tmp.index=i;
+                    tmp.speedX=Math.random()*10-5;
+                    tmp.speedY=Math.random()*10-5;
+                    tmp.isOut=false; //화면을 벗어 났는지여부
+                    //위와 같은 구조의 object 를 아래처럼 작성할수도 있다.
+                    let tmp2={
+                        x:rabbitX,
+                        y:rabbitY,
+                        index:i,
+                        speedX:Math.random()*10-5,
+                        speedY:Math.random()*10-5,
+                        isOut:false
+                    };
+
+                    //배열에 누적 시키기
+                    bubbles.push(tmp);
+                }
+
+                //총에 맞았으니 토끼를 랜덤한 위치로 움직이게 하기
+                rabbitX = Math.random()*700 + 50;
+                rabbitY = Math.random()*400 + 50;
+                //토끼 잡은 갯수 증가 시키기
+                point++;
+                //strong 요소의 innerText 로 출력하기
+                document.querySelector("#point").innerText=point;
+            }
+
+        });
+    </script>
+</body>
+</html>

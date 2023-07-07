@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step05_Modal.html</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="js/bootstrap.bundle.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Modal 테스트</h1>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal">Modal 띄우기</button>
+        <a href="javascript:test()">눌러보셈</a>
+    </div>
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">알림</h3>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    확인 버튼을 누르면 삭제 됩니다.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary">확인</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">알림2</h3>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    확인 버튼을 누르면 저장 됩니다.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary">확인</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        //bootstrap 에서 동작하는 Modal 의 참조값 얻어내기
+        const modal=new bootstrap.Modal("#myModal2", {backdrop:false});
+
+        function test(){
+            //여기에서 #myModal2 를 띄우기
+            modal.show();
+        }
+        // id 가 myModal 인 요소가 화면에 나타났을때 실행할 함수 등록
+        document.querySelector("#myModal").addEventListener("shown.bs.modal", (e)=>{
+            console.log("모달이 떴습니다.");
+        });
+        // id 가 myModal 인 요소가 화면에서 숨겨졌을때 실행할 함수 등록
+        document.querySelector("#myModal").addEventListener("hidden.bs.modal", (e)=>{
+            console.log("모달이 사라졌습니다.");
+        });
+    </script>
+</body>
+</html>
