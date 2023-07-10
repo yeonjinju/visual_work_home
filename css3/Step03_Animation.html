@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step03_Animation.html</title>
+    <style>
+        .round{
+            border: 1px solid red;
+            border-radius: 50%;
+        }
+        #kim{
+            animation: rotateAni 3s linear;
+        }
+        #kim2:hover{
+            /* animation: rotateAni 3s linear; */
+            /* 위의 한줄을 아래의 3줄로 바꾸면 */
+            animation-name:rotateAni; /* 여기서 애니메이션의 이름은 키프레임의 이름 */
+            animation-duration: 3s;
+            animation-timing-function: linear;
+        }
+        .rotate{
+            animation: rotateAni 3s linear;
+        }
+        /*  animation keyfream 정의하기 */
+        @keyframes rotateAni{
+            from{
+                background-color: #ffffff;
+                transform: rotate(0deg);
+            }
+            to{
+                background-color: #ff00ff;
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>animation 테스트</h3>
+        <img class="round" id="kim" src="images/kim1.png">
+        <img class="round" id="kim2" src="images/kim1.png">
+        <img class="round" id="kim3" src="images/kim1.png">
+        <!-- 페이지 로딩시점에 회전 -->
+        <img class="round rotate" id="kim4" src="images/kim1.png">
+    </div>
+    <script>
+        // kim3 는 클릭했을때 rotateAni 라는 키프레임이 적용되도록 해보세요.
+        document.querySelector("#kim3").addEventListener("click", (e)=>{
+            e.target.style.animation="rotateAni 3s linear";
+        });
+        document.querySelector("#kim4").addEventListener("click", (e)=>{
+            e.target.classList.add=("retate");
+        });
+
+        // animation 이 종료되면 animation 라는 이벤트가 발생한다.
+        document.querySelector("#kim4").addEventListener("click", (e)=>{
+            // rotate 클래스를 제거하면 다음번에 다시 추가될때 animation 이 적용된다.
+            e.target.classList.remove("rotate");
+        });
+    </script>
+</body>
+</html>
