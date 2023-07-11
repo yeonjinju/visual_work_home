@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step03_example4.html</title>
+    <link rel="stylesheet" href="css/animate.css">
+    <style>
+        .box{
+            width: 300px;
+            height: 200px;
+            margin: 0 auto;
+            border: 1px solid red;
+            background-color: yellow;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .box{
+            animation: zoomIn 0.5s ease-out;
+        }
+
+        .box img{
+            width: 100px;
+            height: 100px;
+            /* click 혹은 마우스 이벤트를 받지 않도록 한다 */
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            
+        </div>
+    </div>
+    <script>
+        // ajax 요청으로 받아온 출력할 이미지의 경로라고 가정
+        let images=["images/image1.png", "images/image2.png", "images/image3.png",
+        "images/image4.png", "images/image5.png"];
+        // 인덱스를 관리할 변수 
+        let index=0;
+        
+        function makeBox(){
+            // div 요소를 동적으로 만들어서 참조값 얻어내기 
+            const box=document.createElement("div");
+            // box 클래스 추가하고 
+            box.classList.add("box");
+            // img 요소를 만들어서 
+            const img=document.createElement("img");
+            // 이미지 출력하고 
+            img.setAttribute("src", images[index]);
+            // box div 에 추가 
+            box.append(img);
+            index++;
+            if(index == images.length){ // 만일 존재하지 않는 인덱스라면
+                index=0; // 인덱스를 다시 처음으로 되돌린다.
+            }
+            // .wrapper div 의 자식 요소로 추가하기 
+            document.querySelector(".wrapper").append(box);
+            box.addEventListener("click", (e)=>{
+                e.target.remove();
+                makeBox();
+            });
+        }
+        makeBox();
+    </script>
+</body>
+</html>
