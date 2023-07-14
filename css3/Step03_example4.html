@@ -29,10 +29,23 @@
             /* click 혹은 마우스 이벤트를 받지 않도록 한다 */
             pointer-events: none;
         }
+        /*  
+            animate css 에 정의된 클래스를 사용하되 원하는 option 으로 동작하고 싶으면
+            css 를 추가로 적용시키면 된다.
+        */
+        .animate__bounce{
+            animation-iteration-count: 3 ;
+            animation-duration: 1s;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- 
+            class="animate_animated animate_키프레임 이름"
+            위와 같은 클래스를 어떤 요소에 추가하면 페이지 로딩 시점에 한번 동작한다
+         -->
+         <h1 class="animate__animated animate__bounce">An anumates element</h1>
         <div class="wrapper">
             
         </div>

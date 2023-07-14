@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>touchSwipe.html</title>
+    <style>
+         #touchPad{
+            width: 300px;
+            height: 300px;
+            background-color: antiquewhite;
+            border: 1px solid red;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>touch 이벤트 처리</h3>
+        <div id="touchPad">
+
+        </div>
+        phase : <span id="phase"></span><br/>
+        direction : <span id="direction"></span><br/>
+        distance : <span id="distance"></span><br/>
+        coord : <span id="coord"></span><br>
+        속도 : <span id="velocity"></span>
+    </div>  
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
+    <script src="js/jquery.touchSwipe.js"></script> 
+    <script>
+        //터치 시작 시간 
+        let startTime;
+        //터치 끝난 시간 
+        let endTime;
+        //터치가 시작된 좌표
+        let startX, startY;
+        //터치가 끝난 좌표 
+        let endX, endY;
+
+        $("#touchPad").swipe({
+            swipeStatus:function(event, phase, direction, distance){
+                $("#phase").text(phase);
+                $("#direction").text(direction);
+                $("#distance").text(distance);
+                $("#coord").text(event.x+"|"+event.y);
+
+                if(phase=="start"){
+                //터치 시작일때 
+                    //시간
+                    startTime=new Date().getTime();
+                    //좌표
+                    startX=parseInt(event.x);
+                    startY=parseInt(event.y);
+                }else if(phase=="move"){
+                    //터치후 움직이는 상태
+
+                }else if(phase=="cancel"){
+                    //터치하고 조금만 움직이고 띤 상태 
+
+                }else if(phase=="end"){
+                    //터치하고 일정 역치 이상 움직이고 띤 상태 
+                    endTime=new Date().getTime();
+                    //좌표
+                    endX=parseInt(event.x);
+                    endY=parseInt(event.y);
+                    //손가락의 순간 속도 계산하기
+                    let result = Math.pow(endX-startX, 2)+Math.pow(endY-startY, 2);
+                    const v = Math.sqrt(result) /(endTime - startTime); //손가락의 속도
+                    if(direction == "left"){
+                        //왼쪽으로 swipe 했을경우 손가락의 왼쪽방향 속도 
+                        const v2 = distance / (endTime - startTime);
+                    }
+
+                    $("#velocity").text(v);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
