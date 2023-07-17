@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step04_polygon3.html</title>
+    <style>
+        /* 폭 80% 의 크기를 가지는 가운데 정렬된 container */
+        .container{
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .wrapper{
+            perspective: 500px;
+            perspective-origin: 50% 50%;
+            height: 700px;
+            border: 1px dotted green;
+            display: flex;
+            align-items: center;
+        }
+        .polygon{
+            width: 100%;
+            height: 400px;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            transform-origin: 50% 50%;
+        }
+        .polygon > div{
+            width: 100%;
+            border: 1px solid red;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 400px;
+            background-color: antiquewhite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 100px;
+            font-weight: bold;
+            opacity: 0.5;
+            backface-visibility: visible;
+        } 
+        .nav{
+            display: flex;
+            justify-content: center;
+            margin: 10px;
+        }
+        /* 
+            transition 효과를 조건 부로 부여하기 위해 클래스 선택자로 작성해둔다.
+        */
+        .transition{
+            transition: transform 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>3d polygon 테스트</h3>
+        <div class="wrapper">
+            <div class="polygon">
+                 
+            </div>
+        </div>
+        <div class="nav">
+            <button id="leftBtn">&larr;</button>
+            <button id="rightBtn">&rarr;</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
+    <script src="js/jquery.touchSwipe.js"></script> 
+    <script>
+        //n 각형의 폭을 함수에 전달하면 div 를 배치할때 rotateY 값과 translateZ 가 Object 로 리턴되는 함수 
+        function getAngleNtz(n, width) {
+            var angle = Math.round(360 / n);
+            var tz = Math.round((width / 2) / Math.tan((angle * Math.PI) / (2 * 180)));
+            var obj = {
+                angle: angle,
+                tz: tz
+            };
+            return obj;
+        }
+
+        //n각형
+        const n=12;
+        let angle, tz;
+        // y 축 기준 회전하는 값을 저장할 변수 선언하고 초기값 0 대입
+        let rY=0;
+
+        // 만들어야 할 div 가 n 개 이기 때문에 반복문 n번 돌기
+        for(let i=0; i<n; i++){
+            //div 를 만들어서 
+            const div=document.createElement("div");
+            //innerText 를 출력하고 
+            div.innerText=i+1;
+            //.polygon 에 추가하기
+            document.querySelector(".polygon").append(div);
+        }
+
+        //페이지 로딩 시점에 한번 배치
+        transformDiv();
+
+        //window 가 리사이즈 될때 마다 다시 배치
+        $(window).on("resize", ()=>{
+            transformDiv();
+        });
+
+        //div 를 3d 로 배치하는 함수 만들기
+        function transformDiv(){
+            //배칠할때 transition 은 
+            $(".polygon").removeClass("transition");
+            //페이지 로딩 시점에 div 의 width 얻어오기
+            const width=$(".polygon").width();
+            // 6 각형 폭은 400p 인 경우 
+            const obj=getAngleNtz(n, width);
+            //배치하면서 회전시킬 각도
+            angle=obj.angle;
+            //배치하면서 z 축 방향으로 평행이동 해야 하는 값
+            tz=obj.tz;
+
+            document.querySelector(".polygon").style.transform="translateZ(-"+tz+"px)";
+            // .polygon 안에 있는 모든 div 의 참조값을 배열로 얻어내기
+            const divs=document.querySelectorAll(".polygon div");
+            //반복문 돌면서 모든 div 에 transform 적용하기
+            for(let i=0; i<divs.length; i++){
+                let rotate = i*angle;
+                divs[i].style.transform="rotateY("+rotate+"deg) translateZ("+tz+"px)";
+            }      
+            //현재 rY 값 만큼 회전 시키기
+            rotateY();     
+        }
+
+        document.querySelector("#leftBtn").addEventListener("click", ()=>{
+            document.querySelector(".polygon").classList.add("transition");
+            //반시계 방향으로 회전 시키기 위해 angle 만큼 rY 값을 감소 시킨다.
+            rY -= angle;
+            rotateY();
+        });
+
+        document.querySelector("#rightBtn").addEventListener("click", ()=>{
+            document.querySelector(".polygon").classList.add("transition");
+            //시계 방향으로 회전 시키기 위해 angle 만큼 rY 값을 증가 시킨다.
+            rY += angle;
+            rotateY();
+        });
+
+        // .polygon 을 y 축 기준으로 회전하는 함수
+        function rotateY(){
+            document.querySelector(".polygon")
+                .style.transform=`translateZ(-${tz}px) rotateY(${rY}deg)`;
+        }
+        //터치가 시작된 시점의 rY 값을 저장할 변수 
+        let startRY=0;
+
+        // .polygon 에 발생하는 touch 이벤트 처리
+        $(".polygon").swipe({
+            swipeStatus(event, phase, direction, distance){
+                if(phase=="start"){
+                    //transition 제거
+                    $(".polygon").removeClass("transition");
+                //터치 시작된 시점의 현재 rY 값을 변수에 저장한다.
+                    startRY = rY;
+                }else if(phase=="move"){
+                    //터치후 움직이는 상태
+                    if(direction == "left"){
+                        //스와이프한 거리에 비례해서 rY 에 반영해서 회전시킨다.
+                        rY = startRY - distance/10;
+                    }else if(direction == "right"){
+                        rY = startRY + distance/10;
+                    }
+                    rotateY();
+                }else if(phase=="cancel"){
+                    $(".polygon").addClass("transition");
+                    //취소 되었을때는 rY 값을 원상복구 시켜준다.
+                    rY = startRY;
+                    rotateY();
+                }else if(phase=="end"){
+                    $(".polygon").addClass("transition");
+                    //터치하고 일정 역치 이상 움직이고 띤 상태 
+                    if(direction == "left"){
+                        rY = startRY - angle;
+                        rotateY();
+                    }else if(direction == "right"){
+                        rY = startRY + angle;
+                        rotateY();
+                    }
+                }
+            },
+            threshold: 50
+        });
+    </script>    
+</body>
+</html>
